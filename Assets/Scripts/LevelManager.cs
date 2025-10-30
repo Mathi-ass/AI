@@ -5,9 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-    public void PlayGame()
+    public void MainMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+    public void TeamSelect()
     {
         SceneManager.LoadScene(1);
+    }
+    public void PlayGame()
+    {
+        SceneManager.LoadScene(2);
     }
     public void QuitGame()
     {
