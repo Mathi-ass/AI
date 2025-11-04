@@ -4,5 +4,15 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ML-Agents/Scenes/StartMenu.unity
+    guid: e1a015761064c3b4a98f4c8cf8c0e71e
+  - enabled: 1
+    path: Assets/ML-Agents/Scenes/TeamSelectMenu.unity
+    guid: 307f05a806785944cbc32022866efec2
+  - enabled: 1
+    path: Assets/ML-Agents/Scenes/Test Map.unity
+    guid: 1adccd2df6a565846bf88701b50ca694
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
