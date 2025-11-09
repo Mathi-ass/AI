@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/ML-Agents/Scenes/Test Map.unity
     guid: 1adccd2df6a565846bf88701b50ca694
+  - enabled: 1
+    path: Assets/ML-Agents/Scenes/AI Testing.unity
+    guid: 58cd5e9a5f67cf7439cb3ade3d0be319
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

@@ -68,7 +68,7 @@ public class LockObjects : MonoBehaviour
         lastToggleTime = Time.time;
     }
 
-    void LockBox()
+    public void LockBox()
     {
         isLocked = true;
         rb.isKinematic = true;
