@@ -1,2 +1,17 @@
 fileFormatVersion: 2
 guid: 811862e697b9ed84ba561714005d1936
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - lockIconPrefab: {fileID: 4712702951420468645, guid: 2811c5de63e3c13419c1c03b9872e63c,
+      type: 3}
+  - progressRingPrefab: {fileID: 4712702951420468645, guid: 9e49fdb59313a5f4b90db4a51371902e,
+      type: 3}
+  - player: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

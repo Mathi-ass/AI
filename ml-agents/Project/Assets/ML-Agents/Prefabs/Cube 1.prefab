@@ -152,9 +152,9 @@ MonoBehaviour:
   isLocked: 0
   lockIconPrefab: {fileID: 4712702951420468645, guid: 2811c5de63e3c13419c1c03b9872e63c,
     type: 3}
-  progressRingPrefab: {fileID: 5562622079141990644, guid: 6418a8650c949d04eb53b1df10a5d1aa,
+  progressRingPrefab: {fileID: 4712702951420468645, guid: 9e49fdb59313a5f4b90db4a51371902e,
     type: 3}
-  player: {fileID: 0}
+  player: {fileID: 4459864850019384738, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
   maxLockedBoxes: 3
   maxLockDistance: 4
   lockCooldown: 1
