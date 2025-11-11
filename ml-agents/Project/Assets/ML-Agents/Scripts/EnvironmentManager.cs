@@ -1,29 +1,20 @@
 using UnityEngine;
 
 public class EnvironmentManager : MonoBehaviour {
-    [Header("Agent References")]
-    public HiderAgent hider;
     public SeekerAgent seeker;
+    public HiderAgent hider;
+    public LockObjects[] boxes;
 
-    [Header("Spawn Positions")]
-    public Transform hiderStart;
-    public Transform seekerStart;
-
-    // Called by agents when episodes end
     public void ResetEnvironment() {
-        if (hider != null && hiderStart != null) {
-            hider.transform.position = hiderStart.position;
-            hider.transform.rotation = hiderStart.rotation;
-            if (hider.TryGetComponent<Rigidbody>(out var hrb))
-                hrb.linearVelocity = Vector3.zero;
-        }
+        seeker.ResetAgent();
+        hider.ResetAgent();
 
-        if (seeker != null && seekerStart != null) {
-            seeker.transform.position = seekerStart.position;
-            seeker.transform.rotation = seekerStart.rotation;
-            if (seeker.TryGetComponent<Rigidbody>(out var srb))
-                srb.linearVelocity = Vector3.zero;
+        // Reset boxes
+        foreach (var box in boxes) {
+            if (box == null) continue;
+            box.UnlockBox();
+            box.transform.localPosition = new Vector3(
+                Random.Range(35f, 10f), 0.5f, Random.Range(-10f, 4f));
         }
     }
 }
-

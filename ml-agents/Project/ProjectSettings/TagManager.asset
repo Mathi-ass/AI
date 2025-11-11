@@ -32,11 +32,17 @@ TagManager:
   - tile
   - Hider
   - Seeker
+  - key
+  - portal
+  - dragon
+  - lock
+  - Box
+  - Wall
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Box
   - Water
   - UI
   - 

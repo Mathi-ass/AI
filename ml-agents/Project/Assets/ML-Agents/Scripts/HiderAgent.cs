@@ -2,18 +2,27 @@ using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
+using System.Collections.Generic;
 
+[RequireComponent(typeof(Rigidbody))]
 public class HiderAgent : Agent {
     private Rigidbody rb;
+    public float moveSpeed = 5f;
+    public float turnSpeed = 200f;
     public SeekerAgent seeker;
+
+    [Header("Lock Settings")]
+    public float lockRange = 3f;
+    public LayerMask boxMask; // Assign to "Box" layer
+    public float lockCooldown = 2f;
+    private float lastLockTime = -999f;
+
+    private List<LockObjects> nearbyBoxes = new List<LockObjects>();
 
     public override void Initialize() {
         rb = GetComponent<Rigidbody>();
-        seeker = FindFirstObjectByType<SeekerAgent>();
-
-        if (seeker == null) {
-            Debug.LogError("SeekerAgent is not found in the scene!");
-        }
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        if (seeker == null) seeker = FindFirstObjectByType<SeekerAgent>();
     }
 
     public override void CollectObservations(VectorSensor sensor) {
@@ -21,37 +30,71 @@ public class HiderAgent : Agent {
         sensor.AddObservation(rb.linearVelocity);
 
         if (seeker != null)
-            sensor.AddObservation(seeker.transform.localPosition);
+            sensor.AddObservation(seeker.transform.localPosition - transform.localPosition);
         else
             sensor.AddObservation(Vector3.zero);
+
+        // Observation: how many boxes nearby
+        Collider[] hits = Physics.OverlapSphere(transform.position, lockRange, boxMask);
+        sensor.AddObservation(hits.Length / 5.0f); // normalized count (max ~5)
+
+        sensor.AddObservation(transform.localPosition);
+        sensor.AddObservation(seeker.transform.localPosition - transform.localPosition);
+        sensor.AddObservation(GetComponent<Rigidbody>().linearVelocity);
+
     }
 
     public override void OnActionReceived(ActionBuffers actions) {
-        float move = actions.ContinuousActions[0];
-        float turn = actions.ContinuousActions[1];
+        int moveAction = actions.DiscreteActions[0];  // 0: none, 1: forward, 2: back
+        int turnAction = actions.DiscreteActions[1];  // 0: none, 1: left, 2: right
+        int lockAction = actions.DiscreteActions[2];  // 0: none, 1: lock
 
-        rb.linearVelocity = transform.forward * move * 5f;
-        transform.Rotate(Vector3.up, turn * 180f * Time.fixedDeltaTime);
+        // Movement
+        Vector3 moveDir = Vector3.zero;
+        if (moveAction == 1) moveDir = transform.forward;
+        else if (moveAction == 2) moveDir = -transform.forward;
 
-        AddReward(0.001f); // survive reward
+        rb.MovePosition(rb.position + moveDir * moveSpeed * Time.deltaTime);
+
+        float turn = 0f;
+        if (turnAction == 1) turn = -1f;
+        else if (turnAction == 2) turn = 1f;
+        rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turn * turnSpeed * Time.deltaTime, 0f));
+
+        // Try to lock a box
+        if (lockAction == 1 && Time.time > lastLockTime + lockCooldown) {
+            TryLockNearbyBox();
+            lastLockTime = Time.time;
+        }
+
+        // Time-based survival reward
+        AddReward(+0.001f);
+
+        if (StepCount > MaxStep) {
+            EndEpisode();
+        }
+    }
+
+    void TryLockNearbyBox() {
+        Collider[] hits = Physics.OverlapSphere(transform.position, lockRange, boxMask);
+        foreach (Collider col in hits) {
+            LockObjects box = col.GetComponent<LockObjects>();
+            if (box != null && !box.isLocked) {
+                box.LockBox();
+                AddReward(+0.2f); // reward for using box effectively
+                break;
+            }
+        }
     }
 
     public void OnCaught() {
-        SetReward(-1f); // negative reward for getting caught
+        AddReward(-1.0f);
+        FindFirstObjectByType<EnvironmentManager>()?.ResetEnvironment();
         EndEpisode();
-
-        // optional: reset the environment
-        var env = FindFirstObjectByType<EnvironmentManager>();
-        if (env != null)
-            env.ResetEnvironment();
     }
 
-
-    public override void Heuristic(in ActionBuffers actionsOut) {
-        var ca = actionsOut.ContinuousActions;
-        ca[0] = Input.GetAxis("Vertical");
-        ca[1] = Input.GetAxis("Horizontal");
+    public void ResetAgent() {
+        rb.linearVelocity = Vector3.zero;
+        transform.localPosition = new Vector3(Random.Range(20f, 20f), 1f, Random.Range(2f, 2f));
     }
 }
-
-
