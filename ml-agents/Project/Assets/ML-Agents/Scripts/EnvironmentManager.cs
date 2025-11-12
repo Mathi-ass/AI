@@ -14,7 +14,7 @@ public class EnvironmentManager : MonoBehaviour {
             if (box == null) continue;
             box.UnlockBox();
             box.transform.localPosition = new Vector3(
-                Random.Range(35f, 10f), 0.5f, Random.Range(-10f, 4f));
+                Random.Range(12f, -12f), 0.5f, Random.Range(7f, -7f));
         }
     }
 }

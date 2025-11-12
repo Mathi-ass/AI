@@ -29,16 +29,10 @@ public class HiderAgent : Agent {
         sensor.AddObservation(transform.localPosition);
         sensor.AddObservation(rb.linearVelocity);
 
-        if (seeker != null)
-            sensor.AddObservation(seeker.transform.localPosition - transform.localPosition);
-        else
-            sensor.AddObservation(Vector3.zero);
-
         // Observation: how many boxes nearby
         Collider[] hits = Physics.OverlapSphere(transform.position, lockRange, boxMask);
         sensor.AddObservation(hits.Length / 5.0f); // normalized count (max ~5)
 
-        sensor.AddObservation(transform.localPosition);
         sensor.AddObservation(seeker.transform.localPosition - transform.localPosition);
         sensor.AddObservation(GetComponent<Rigidbody>().linearVelocity);
 
@@ -95,6 +89,6 @@ public class HiderAgent : Agent {
 
     public void ResetAgent() {
         rb.linearVelocity = Vector3.zero;
-        transform.localPosition = new Vector3(Random.Range(20f, 20f), 1f, Random.Range(2f, 2f));
+        transform.localPosition = new Vector3(Random.Range(-3f, -3f), 1.5f, Random.Range(0f, 0f));
     }
 }

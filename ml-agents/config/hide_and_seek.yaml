@@ -1,6 +1,9 @@
 behaviors:
   Seeker:
     trainer_type: ppo
+    max_steps: 2.0e6
+    time_horizon: 1280
+    summary_freq: 10000
     hyperparameters:
       batch_size: 1024
       buffer_size: 20480
@@ -20,6 +23,9 @@ behaviors:
 
   Hider:
     trainer_type: ppo
+    max_steps: 2.0e6
+    time_horizon: 1280
+    summary_freq: 10000
     hyperparameters:
       batch_size: 1024
       buffer_size: 20480

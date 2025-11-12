@@ -25,10 +25,6 @@ public class LockObjects : MonoBehaviour
     public float lockCooldown = 1f; // Nedkølingsperiode mellem lås/oplås
     private float lastToggleTime = -999f;
 
-    [Header("Visual Feedback")]
-    public float fadeDistance = 2f; // Hvor tæt spilleren skal være for at gøre objektet gennemsigtig
-    public float fadedAlpha = 0.75f; // Hvor gennemsigtig objektet bliver
-
     // Per-material instances so changes only affect this renderer
     private Material[] instanceMaterials;
     private float[] normalAlphas;
@@ -53,70 +49,6 @@ public class LockObjects : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         boxRenderer = GetComponentInChildren<Renderer>();
-
-        if (boxRenderer != null)
-        {
-            // Get material instances for this renderer (creates instances)
-            instanceMaterials = boxRenderer.materials;
-            normalAlphas = new float[instanceMaterials.Length];
-
-            for (int i = 0; i < instanceMaterials.Length; i++)
-            {
-                Material mat = instanceMaterials[i];
-                if (mat == null) continue;
-
-                // Remember original alpha for this material
-                normalAlphas[i] = mat.color.a;
-
-                // Configure material to a transparency-friendly mode depending on shader
-                // Standard shader uses _Mode
-                if (mat.HasProperty("_Mode"))
-                {
-                    mat.SetFloat("_Mode", 2f); // 2 = Fade
-                    mat.SetOverrideTag("RenderType", "Transparent");
-                    mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-                    mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-                    mat.SetInt("_ZWrite", 0);
-                    mat.DisableKeyword("_ALPHATEST_ON");
-                    mat.EnableKeyword("_ALPHABLEND_ON");
-                    mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-                    mat.renderQueue = 3000;
-
-                    // Reduce specular/metallic/glossiness so lit faces visually fade the same as other faces
-                    if (mat.HasProperty("_Glossiness"))
-                        mat.SetFloat("_Glossiness", 0f);
-                    if (mat.HasProperty("_Metallic"))
-                        mat.SetFloat("_Metallic", 0f);
-
-                    // Disable specular highlights and glossy reflections keywords (standard shader uses these)
-                    mat.DisableKeyword("_SPECULARHIGHLIGHTS_ON");
-                    mat.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
-                    mat.DisableKeyword("_GLOSSYREFLECTIONS_ON");
-                    mat.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-                }
-                // Universal RP Lit uses _Surface (0 = Opaque, 1 = Transparent) and _Blend (0 = Alpha)
-                else if (mat.HasProperty("_Surface"))
-                {
-                    try
-                    {
-                        mat.SetFloat("_Surface", 1f); // Transparent
-                        mat.SetOverrideTag("RenderType", "Transparent");
-                        if (mat.HasProperty("_Blend"))
-                            mat.SetFloat("_Blend", 0f); // Alpha blend
-                        if (mat.HasProperty("_ZWrite"))
-                            mat.SetInt("_ZWrite", 0);
-                        mat.renderQueue = 3000;
-                        // Also reduce smoothness/metallic to avoid strong highlights on lit side
-                        if (mat.HasProperty("_Smoothness"))
-                            mat.SetFloat("_Smoothness", 0f);
-                        if (mat.HasProperty("_Metallic"))
-                            mat.SetFloat("_Metallic", 0f);
-                    }
-                    catch { /* fallback silently */ }
-                }
-                // HDRP and other shaders: may require editing material in the editor if transparency still doesn't behave correctly
-            }
-        }
     }
 
     void OnMouseDown()
@@ -222,24 +154,6 @@ public class LockObjects : MonoBehaviour
 
     void Update()
     {
-        // Fade, når spiller er tæt på objekt
-        if (player != null && boxRenderer != null && instanceMaterials != null)
-        {
-            float dist = Vector3.Distance(player.position, transform.position);
-
-            for (int i = 0; i < instanceMaterials.Length; i++)
-            {
-                Material mat = instanceMaterials[i];
-                if (mat == null) continue;
-
-                float targetAlpha = dist < fadeDistance ? fadedAlpha : normalAlphas[i];
-
-                // Read current color, lerp alpha toward target, write back
-                Color c = mat.color;
-                c.a = Mathf.Lerp(c.a, targetAlpha, Time.deltaTime * 10f);
-                mat.color = c;
-            }
-        }
 
         // Rotation af ikon + progress ring
         if (player != null)

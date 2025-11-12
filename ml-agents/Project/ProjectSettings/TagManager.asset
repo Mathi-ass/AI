@@ -45,10 +45,10 @@ TagManager:
   - Box
   - Water
   - UI
-  - 
-  - 
+  - Hider
+  - Wall
   - invisible
-  - 
+  - Seeker
   - 
   - 
   - 
